@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "wfaClockTrainer (WinForms)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-wfa",
+      "program": "${workspaceFolder}/ClockTrainer/wfaClockTrainer/bin/Debug/net10.0-windows/wfaClockTrainer.dll",
+      "cwd": "${workspaceFolder}/ClockTrainer/wfaClockTrainer",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "cnsClockTrainer (консоль)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-cns",
+      "program": "${workspaceFolder}/ClockTrainer/cnsClockTrainer/bin/Debug/net10.0/cnsClockTrainer.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ClockTrainer/cnsClockTrainer",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}

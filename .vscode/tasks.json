@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-wfa",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/ClockTrainer/wfaClockTrainer/wfaClockTrainer.csproj"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-cns",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/ClockTrainer/cnsClockTrainer/cnsClockTrainer.csproj"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

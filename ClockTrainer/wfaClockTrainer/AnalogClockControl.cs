@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace ClockTrainer.WinForms;
@@ -24,6 +25,7 @@ public sealed class AnalogClockControl : Control
         Size = new Size(220, 220);
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public TimeOnly Time
     {
         get => _time;
@@ -34,9 +36,36 @@ public sealed class AnalogClockControl : Control
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Interactive { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SnapMinutes { get; set; } = 1;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Color FaceColor { get; set; } = Color.White;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Color BorderColor { get; set; } = Color.Black;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Color NumberColor { get; set; } = Color.Black;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Color HourHandColor { get; set; } = Color.Black;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Color MinuteHandColor { get; set; } = Color.DarkSlateGray;
+
+    public void ApplyPalette(Palette palette)
+    {
+        FaceColor = palette.ClockFace;
+        BorderColor = palette.ClockBorder;
+        NumberColor = palette.Text;
+        HourHandColor = palette.HourHand;
+        MinuteHandColor = palette.MinuteHand;
+        Invalidate();
+    }
 
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -49,11 +78,13 @@ public sealed class AnalogClockControl : Control
         var radius = diameter / 2.0;
         var center = new PointF(Width / 2f, Height / 2f);
 
-        using var facePen = new Pen(Color.Black, 2);
+        using var facePen = new Pen(BorderColor, 3);
+        using var tickPen = new Pen(BorderColor, 2);
+        using var faceBrush = new SolidBrush(FaceColor);
         using var numberFont = new Font(Font.FontFamily, (float)(radius * 0.14), FontStyle.Bold);
-        using var numberBrush = new SolidBrush(ForeColor);
+        using var numberBrush = new SolidBrush(NumberColor);
 
-        g.FillEllipse(Brushes.White, (float)(center.X - radius), (float)(center.Y - radius), diameter, diameter);
+        g.FillEllipse(faceBrush, (float)(center.X - radius), (float)(center.Y - radius), diameter, diameter);
         g.DrawEllipse(facePen, (float)(center.X - radius), (float)(center.Y - radius), diameter, diameter);
 
         for (var i = 1; i <= 12; i++)
@@ -61,7 +92,7 @@ public sealed class AnalogClockControl : Control
             var angle = i / 12.0 * 2 * Math.PI;
             var tickOuter = PointOnClock(center, radius - 4, angle);
             var tickInner = PointOnClock(center, radius - 14, angle);
-            g.DrawLine(facePen, tickInner, tickOuter);
+            g.DrawLine(tickPen, tickInner, tickOuter);
 
             var numberPos = PointOnClock(center, radius - 28, angle);
             var text = i.ToString();
@@ -69,10 +100,11 @@ public sealed class AnalogClockControl : Control
             g.DrawString(text, numberFont, numberBrush, numberPos.X - textSize.Width / 2, numberPos.Y - textSize.Height / 2);
         }
 
-        DrawHand(g, center, radius * 0.5, HourAngle(), 5, Color.Black);
-        DrawHand(g, center, radius * 0.75, MinuteAngle(), 3, Color.DarkSlateGray);
+        DrawHand(g, center, radius * 0.5, HourAngle(), 5, HourHandColor);
+        DrawHand(g, center, radius * 0.75, MinuteAngle(), 3, MinuteHandColor);
 
-        g.FillEllipse(Brushes.Black, center.X - 3, center.Y - 3, 6, 6);
+        using var pivotBrush = new SolidBrush(BorderColor);
+        g.FillEllipse(pivotBrush, center.X - 3, center.Y - 3, 6, 6);
     }
 
     protected override void OnMouseDown(MouseEventArgs e)

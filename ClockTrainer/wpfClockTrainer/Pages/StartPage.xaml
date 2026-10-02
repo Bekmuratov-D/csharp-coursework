@@ -1,0 +1,47 @@
+<UserControl x:Class="ClockTrainer.Wpf.Pages.StartPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <Grid Background="{DynamicResource BackgroundBrush}">
+        <Border Style="{StaticResource CardBorder}" MaxWidth="640" Padding="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="🕐 Тренажёр определения времени" Style="{StaticResource PageTitleText}"
+                           TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,24"/>
+
+                <TextBlock Text="РЕЖИМ" Style="{StaticResource SectionLabelText}"/>
+                <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <RadioButton x:Name="ModeLearnRadio" GroupName="Mode" Style="{StaticResource ChipToggleButton}" Content="🎓 Обучение"/>
+                    <RadioButton x:Name="ModeTestRadio" GroupName="Mode" Style="{StaticResource ChipToggleButton}" Content="🏆 Проверка знаний"/>
+                </WrapPanel>
+
+                <TextBlock Text="УПРАЖНЕНИЕ" Style="{StaticResource SectionLabelText}"/>
+                <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <RadioButton x:Name="KindSetRadio" GroupName="Kind" Style="{StaticResource ChipToggleButton}" Content="👉 Выставь стрелки" Checked="KindRadio_Checked"/>
+                    <RadioButton x:Name="KindElapsedRadio" GroupName="Kind" Style="{StaticResource ChipToggleButton}" Content="⏳ Сколько прошло" Checked="KindRadio_Checked"/>
+                </WrapPanel>
+
+                <StackPanel x:Name="FormatPanel">
+                    <TextBlock Text="КАК ПОКАЗЫВАТЬ ВРЕМЯ" Style="{StaticResource SectionLabelText}"/>
+                    <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <RadioButton x:Name="FormatDigitsRadio" GroupName="Format" Style="{StaticResource ChipToggleButton}" Content="🔢 Цифрами"/>
+                        <RadioButton x:Name="FormatWordsRadio" GroupName="Format" Style="{StaticResource ChipToggleButton}" Content="🗣️ Словами"/>
+                        <RadioButton x:Name="FormatMixedRadio" GroupName="Format" Style="{StaticResource ChipToggleButton}" Content="🔀 Вперемешку"/>
+                    </WrapPanel>
+                </StackPanel>
+
+                <TextBlock Text="СЛОЖНОСТЬ" Style="{StaticResource SectionLabelText}"/>
+                <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                    <RadioButton x:Name="DifficultyEasyRadio" GroupName="Difficulty" Style="{StaticResource ChipToggleButton}" Content="🙂 Лёгкая"/>
+                    <RadioButton x:Name="DifficultyMediumRadio" GroupName="Difficulty" Style="{StaticResource ChipToggleButton}" Content="😐 Средняя"/>
+                    <RadioButton x:Name="DifficultyHardRadio" GroupName="Difficulty" Style="{StaticResource ChipToggleButton}" Content="🔥 Сложная"/>
+                </WrapPanel>
+
+                <Button x:Name="PlayButton" Content="▶  Играть" Style="{StaticResource PillButton}"
+                        FontSize="16" HorizontalAlignment="Center" Padding="36,12"
+                        Click="PlayButton_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -9,20 +9,29 @@ public sealed class RandomExerciseGenerator : IExerciseGenerator
         _random = random ?? new Random();
     }
 
-    public ClockExercise Next(ExerciseKind kind, Difficulty difficulty) => kind switch
+    public ClockExercise Next(ExerciseKind kind, Difficulty difficulty, PromptFormat format = PromptFormat.Digits) => kind switch
     {
-        ExerciseKind.SetTime => GenerateSetTime(difficulty),
+        ExerciseKind.SetTime => GenerateSetTime(difficulty, format),
         ExerciseKind.ElapsedTime => GenerateElapsedTime(difficulty),
         _ => throw new ArgumentOutOfRangeException(nameof(kind))
     };
 
-    private SetTimeExercise GenerateSetTime(Difficulty difficulty)
+    private SetTimeExercise GenerateSetTime(Difficulty difficulty, PromptFormat format)
     {
         var step = difficulty.StepMinutes();
         var totalSteps = 24 * 60 / step;
         var minutes = _random.Next(0, totalSteps) * step;
         var target = new TimeOnly(0, 0).AddMinutes(minutes);
-        return new SetTimeExercise(target, difficulty);
+
+        var useWords = format switch
+        {
+            PromptFormat.Digits => false,
+            PromptFormat.Words => true,
+            PromptFormat.Mixed => _random.Next(2) == 0,
+            _ => false
+        };
+
+        return new SetTimeExercise(target, difficulty, useWords);
     }
 
     private ElapsedTimeExercise GenerateElapsedTime(Difficulty difficulty)

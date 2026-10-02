@@ -2,4 +2,5 @@
   <Project Path="libClockCore/libClockCore.csproj" />
   <Project Path="cnsClockTrainer/cnsClockTrainer.csproj" />
   <Project Path="wfaClockTrainer/wfaClockTrainer.csproj" />
+  <Project Path="wpfClockTrainer/wpfClockTrainer.csproj" />
 </Solution>

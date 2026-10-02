@@ -8,9 +8,14 @@ public sealed class MainForm : Form
     private readonly AppSettings _settings;
     private readonly TrainerSession _session;
 
+    private FlowLayoutPanel _topPanel = null!;
     private ComboBox _modeCombo = null!;
     private ComboBox _kindCombo = null!;
     private ComboBox _difficultyCombo = null!;
+    private RoundedButton _newExerciseButton = null!;
+    private RoundedButton _checkButton = null!;
+    private RoundedButton _settingsButton = null!;
+    private RoundedButton _helpButton = null!;
     private Label _promptLabel = null!;
     private Label _statusLabel = null!;
     private Label _statsLabel = null!;
@@ -19,6 +24,8 @@ public sealed class MainForm : Form
     private AnalogClockControl? _setTimeClock;
     private NumericUpDown? _hoursInput;
     private NumericUpDown? _minutesInput;
+    private RoundedButton? _amButton;
+    private RoundedButton? _pmButton;
 
     public MainForm(CliOptions startupOptions)
     {
@@ -27,8 +34,9 @@ public sealed class MainForm : Form
         var mode = startupOptions.Mode ?? _settings.LastMode;
         var kind = startupOptions.Kind ?? _settings.LastKind;
         var difficulty = startupOptions.Difficulty ?? _settings.LastDifficulty;
+        var format = startupOptions.Format ?? _settings.LastPromptFormat;
 
-        _session = new TrainerSession(new RandomExerciseGenerator(), mode, kind, difficulty);
+        _session = new TrainerSession(new RandomExerciseGenerator(), mode, kind, difficulty, format);
         _session.ExerciseGenerated += OnExerciseGenerated;
         _session.AnswerEvaluated += OnAnswerEvaluated;
         _session.StatisticsChanged += (_, _) => UpdateStatsLabel();
@@ -47,72 +55,74 @@ public sealed class MainForm : Form
 
     private void BuildLayout()
     {
-        Text = "Тренажёр определения времени";
-        MinimumSize = new Size(640, 480);
-        Size = new Size(760, 560);
+        Text = "🕐 Тренажёр определения времени";
+        MinimumSize = new Size(680, 520);
+        Size = new Size(800, 600);
         KeyPreview = true;
         KeyDown += MainForm_KeyDown;
+        Font = new Font("Segoe UI", 9.5F);
 
-        var topPanel = new FlowLayoutPanel
+        _topPanel = new FlowLayoutPanel
         {
             Dock = DockStyle.Top,
             AutoSize = true,
-            Padding = new Padding(8),
+            Padding = new Padding(12, 10, 12, 10),
             FlowDirection = FlowDirection.LeftToRight
         };
 
-        _modeCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160 };
-        _kindCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 200 };
-        _difficultyCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 120 };
-        var newExerciseButton = new Button { Text = "Новое (N)", AutoSize = true };
-        var checkButton = new Button { Text = "Проверить (Enter)", AutoSize = true };
-        var settingsButton = new Button { Text = "Настройки", AutoSize = true };
-        var helpButton = new Button { Text = "Справка (F1)", AutoSize = true };
+        _modeCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160, FlatStyle = FlatStyle.Flat };
+        _kindCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 210, FlatStyle = FlatStyle.Flat };
+        _difficultyCombo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 120, FlatStyle = FlatStyle.Flat };
+
+        _newExerciseButton = new RoundedButton { Text = "🔄 Новое (N)" };
+        _checkButton = new RoundedButton { Text = "✅ Проверить (Enter)" };
+        _settingsButton = new RoundedButton { Text = "⚙️ Настройки" };
+        _helpButton = new RoundedButton { Text = "❓ Справка (F1)" };
 
         _modeCombo.Items.AddRange(
         [
-            new ComboItem<TrainerMode>("Обучение", TrainerMode.Learn),
-            new ComboItem<TrainerMode>("Проверка знаний", TrainerMode.Test)
+            new ComboItem<TrainerMode>("🎓 Обучение", TrainerMode.Learn),
+            new ComboItem<TrainerMode>("🏆 Проверка знаний", TrainerMode.Test)
         ]);
         _kindCombo.Items.AddRange(
         [
-            new ComboItem<ExerciseKind>("Выставь стрелки", ExerciseKind.SetTime),
-            new ComboItem<ExerciseKind>("Сколько времени прошло", ExerciseKind.ElapsedTime)
+            new ComboItem<ExerciseKind>("👉 Выставь стрелки", ExerciseKind.SetTime),
+            new ComboItem<ExerciseKind>("⏳ Сколько времени прошло", ExerciseKind.ElapsedTime)
         ]);
         _difficultyCombo.Items.AddRange(
         [
-            new ComboItem<Difficulty>("Лёгкая", Difficulty.Easy),
-            new ComboItem<Difficulty>("Средняя", Difficulty.Medium),
-            new ComboItem<Difficulty>("Сложная", Difficulty.Hard)
+            new ComboItem<Difficulty>("🙂 Лёгкая", Difficulty.Easy),
+            new ComboItem<Difficulty>("😐 Средняя", Difficulty.Medium),
+            new ComboItem<Difficulty>("🔥 Сложная", Difficulty.Hard)
         ]);
 
-        newExerciseButton.Click += (_, _) => StartNewExercise();
-        checkButton.Click += (_, _) => SubmitAnswer();
-        settingsButton.Click += (_, _) => OpenSettings();
-        helpButton.Click += (_, _) => ShowHelp();
+        _newExerciseButton.Click += (_, _) => StartNewExercise();
+        _checkButton.Click += (_, _) => SubmitAnswer();
+        _settingsButton.Click += (_, _) => OpenSettings();
+        _helpButton.Click += (_, _) => ShowHelp();
 
-        topPanel.Controls.Add(LabeledControl("Режим:", _modeCombo));
-        topPanel.Controls.Add(LabeledControl("Упражнение:", _kindCombo));
-        topPanel.Controls.Add(LabeledControl("Сложность:", _difficultyCombo));
-        topPanel.Controls.Add(newExerciseButton);
-        topPanel.Controls.Add(checkButton);
-        topPanel.Controls.Add(settingsButton);
-        topPanel.Controls.Add(helpButton);
+        _topPanel.Controls.Add(LabeledControl("Режим:", _modeCombo));
+        _topPanel.Controls.Add(LabeledControl("Упражнение:", _kindCombo));
+        _topPanel.Controls.Add(LabeledControl("Сложность:", _difficultyCombo));
+        _topPanel.Controls.Add(PadTop(_newExerciseButton));
+        _topPanel.Controls.Add(PadTop(_checkButton));
+        _topPanel.Controls.Add(PadTop(_settingsButton));
+        _topPanel.Controls.Add(PadTop(_helpButton));
 
         _promptLabel = new Label
         {
             Dock = DockStyle.Top,
-            Height = 32,
+            Height = 40,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font(Font.FontFamily, 12, FontStyle.Bold)
+            Font = new Font("Segoe UI", 13, FontStyle.Bold)
         };
 
         _statusLabel = new Label
         {
             Dock = DockStyle.Top,
-            Height = 28,
+            Height = 30,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font(Font.FontFamily, 10, FontStyle.Bold)
+            Font = new Font("Segoe UI", 11, FontStyle.Bold)
         };
 
         _exercisePanel = new Panel { Dock = DockStyle.Fill };
@@ -120,15 +130,22 @@ public sealed class MainForm : Form
         _statsLabel = new Label
         {
             Dock = DockStyle.Bottom,
-            Height = 24,
-            TextAlign = ContentAlignment.MiddleCenter
+            Height = 28,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Font = new Font("Segoe UI", 9.5F, FontStyle.Bold)
         };
 
         Controls.Add(_exercisePanel);
         Controls.Add(_statusLabel);
         Controls.Add(_promptLabel);
         Controls.Add(_statsLabel);
-        Controls.Add(topPanel);
+        Controls.Add(_topPanel);
+    }
+
+    private static Control PadTop(Control control)
+    {
+        control.Margin = new Padding(6, 18, 0, 0);
+        return control;
     }
 
     private void MainForm_KeyDown(object? sender, KeyEventArgs e)
@@ -151,7 +168,42 @@ public sealed class MainForm : Form
                 OpenSettings();
                 e.Handled = true;
                 break;
+            case Keys.Space when _session.Current is SetTimeExercise:
+                TogglePeriod();
+                e.Handled = true;
+                break;
         }
+    }
+
+    private void TogglePeriod()
+    {
+        if (_setTimeClock is null) return;
+        var time = _setTimeClock.Time;
+        _setTimeClock.Time = new TimeOnly((time.Hour + 12) % 24, time.Minute);
+    }
+
+    private void SetPeriod(bool isPm)
+    {
+        if (_setTimeClock is null) return;
+        var time = _setTimeClock.Time;
+        _setTimeClock.Time = new TimeOnly(time.Hour % 12 + (isPm ? 12 : 0), time.Minute);
+    }
+
+    private void UpdatePeriodButtons()
+    {
+        if (_setTimeClock is null || _amButton is null || _pmButton is null) return;
+
+        var palette = Theme.For(_settings.Theme);
+        var isPm = _setTimeClock.Time.Hour >= 12;
+
+        StylePeriodButton(_amButton, selected: !isPm, palette);
+        StylePeriodButton(_pmButton, selected: isPm, palette);
+    }
+
+    private static void StylePeriodButton(RoundedButton button, bool selected, Palette palette)
+    {
+        button.BackColor = selected ? palette.Primary : palette.Surface;
+        button.ForeColor = selected ? Color.White : palette.Muted;
     }
 
     private void StartNewExercise()
@@ -185,7 +237,7 @@ public sealed class MainForm : Form
     private void OnExerciseGenerated(object? sender, ClockExercise exercise)
     {
         _statusLabel.Text = string.Empty;
-        _promptLabel.Text = exercise.Prompt;
+        _promptLabel.Text = $"🕐 {exercise.Prompt}";
 
         foreach (Control control in _exercisePanel.Controls)
             control.Dispose();
@@ -194,6 +246,8 @@ public sealed class MainForm : Form
         _setTimeClock = null;
         _hoursInput = null;
         _minutesInput = null;
+        _amButton = null;
+        _pmButton = null;
 
         Control view = exercise switch
         {
@@ -202,21 +256,25 @@ public sealed class MainForm : Form
             _ => throw new InvalidOperationException("Неизвестный тип упражнения.")
         };
         _exercisePanel.Controls.Add(view);
+        ApplyExercisePalette();
     }
 
     private void OnAnswerEvaluated(object? sender, bool correct)
     {
         var exercise = _session.Current!;
+        var palette = Theme.For(_settings.Theme);
 
         if (_session.Mode == TrainerMode.Learn)
         {
-            _statusLabel.Text = $"Правильный ответ: {exercise.CorrectAnswerText}";
-            _statusLabel.ForeColor = Color.DarkBlue;
+            _statusLabel.Text = $"💡 Правильный ответ: {exercise.CorrectAnswerText}";
+            _statusLabel.ForeColor = palette.Primary;
         }
         else
         {
-            _statusLabel.Text = correct ? "Верно!" : $"Неверно. Правильный ответ: {exercise.CorrectAnswerText}";
-            _statusLabel.ForeColor = correct ? Color.Green : Color.Firebrick;
+            _statusLabel.Text = correct
+                ? "✅ Верно!"
+                : $"❌ Неверно. Правильный ответ: {exercise.CorrectAnswerText}";
+            _statusLabel.ForeColor = correct ? palette.Success : palette.Danger;
         }
     }
 
@@ -230,16 +288,65 @@ public sealed class MainForm : Form
             Size = new Size(260, 260)
         };
 
+        _amButton = new RoundedButton { Text = "AM", Width = 80 };
+        _pmButton = new RoundedButton { Text = "PM", Width = 80 };
+
+        _amButton.Click += (_, _) => SetPeriod(isPm: false);
+        _pmButton.Click += (_, _) => SetPeriod(isPm: true);
+        _setTimeClock.TimeChanged += (_, _) => UpdatePeriodButtons();
+        UpdatePeriodButtons();
+
+        var switchPanel = new TableLayoutPanel
+        {
+            AutoSize = true,
+            ColumnCount = 2,
+            RowCount = 1,
+            CellBorderStyle = TableLayoutPanelCellBorderStyle.None
+        };
+        switchPanel.Controls.Add(_amButton, 0, 0);
+        switchPanel.Controls.Add(_pmButton, 1, 0);
+
+        var hintLabel = new Label
+        {
+            Text = "подсказка: пробел тоже переключает АМ/ПМ",
+            AutoSize = true,
+            Font = new Font("Segoe UI", 8, FontStyle.Italic),
+            TextAlign = ContentAlignment.MiddleCenter
+        };
+
+        var bottomPanel = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Bottom,
+            AutoSize = true,
+            FlowDirection = FlowDirection.TopDown,
+            WrapContents = false,
+            Padding = new Padding(8)
+        };
+        bottomPanel.Controls.Add(switchPanel);
+        bottomPanel.Controls.Add(hintLabel);
+
+        void CenterBottomPanel()
+        {
+            switchPanel.Left = (bottomPanel.ClientSize.Width - switchPanel.Width) / 2;
+            hintLabel.Left = (bottomPanel.ClientSize.Width - hintLabel.Width) / 2;
+        }
+
+        bottomPanel.Resize += (_, _) => CenterBottomPanel();
+
+        var clockArea = new Panel { Dock = DockStyle.Fill };
+        clockArea.Controls.Add(_setTimeClock);
+
         var container = new Panel { Dock = DockStyle.Fill };
-        container.Controls.Add(_setTimeClock);
+        container.Controls.Add(clockArea);
+        container.Controls.Add(bottomPanel);
 
         void Reposition()
         {
-            _setTimeClock.Left = (container.ClientSize.Width - _setTimeClock.Width) / 2;
-            _setTimeClock.Top = (container.ClientSize.Height - _setTimeClock.Height) / 2;
+            _setTimeClock.Left = (clockArea.ClientSize.Width - _setTimeClock.Width) / 2;
+            _setTimeClock.Top = (clockArea.ClientSize.Height - _setTimeClock.Height) / 2;
         }
 
-        container.Resize += (_, _) => Reposition();
+        clockArea.Resize += (_, _) => Reposition();
         Reposition();
 
         return container;
@@ -256,8 +363,8 @@ public sealed class MainForm : Form
         clocksLayout.Controls.Add(BuildLabeledClock("До", beforeClock), 0, 0);
         clocksLayout.Controls.Add(BuildLabeledClock("После", afterClock), 1, 0);
 
-        _hoursInput = new NumericUpDown { Minimum = 0, Maximum = 23, Width = 60 };
-        _minutesInput = new NumericUpDown { Minimum = 0, Maximum = 59, Width = 60 };
+        _hoursInput = new NumericUpDown { Minimum = 0, Maximum = 23, Width = 60, Font = new Font("Segoe UI", 10) };
+        _minutesInput = new NumericUpDown { Minimum = 0, Maximum = 59, Width = 60, Font = new Font("Segoe UI", 10) };
 
         var answerPanel = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, Padding = new Padding(8) };
         answerPanel.Controls.Add(new Label { Text = "Прошло: часов", AutoSize = true, Margin = new Padding(0, 8, 4, 0) });
@@ -279,9 +386,9 @@ public sealed class MainForm : Form
         {
             Text = title,
             Dock = DockStyle.Top,
-            Height = 24,
+            Height = 26,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font(panel.Font, FontStyle.Bold)
+            Font = new Font("Segoe UI", 10, FontStyle.Bold)
         };
 
         panel.Controls.Add(clock);
@@ -302,7 +409,7 @@ public sealed class MainForm : Form
     private static Control LabeledControl(string text, Control control)
     {
         var panel = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown };
-        panel.Controls.Add(new Label { Text = text, AutoSize = true });
+        panel.Controls.Add(new Label { Text = text, AutoSize = true, Font = new Font("Segoe UI", 8) });
         panel.Controls.Add(control);
         return panel;
     }
@@ -322,8 +429,8 @@ public sealed class MainForm : Form
     private void UpdateStatsLabel()
     {
         _statsLabel.Text = _session.Mode == TrainerMode.Test
-            ? $"Верно: {_session.Stats.Correct}   Неверно: {_session.Stats.Incorrect}   Точность: {_session.Stats.Accuracy:F0}%"
-            : "Режим обучения — статистика не ведётся";
+            ? $"📊 Верно: {_session.Stats.Correct}   Неверно: {_session.Stats.Incorrect}   Точность: {_session.Stats.Accuracy:F0}%"
+            : "🎓 Режим обучения — статистика не ведётся";
     }
 
     private void OpenSettings()
@@ -344,6 +451,7 @@ public sealed class MainForm : Form
             "  N — новое упражнение\n" +
             "  Ctrl+, — настройки\n" +
             "  F1 — эта справка\n" +
+            "  Пробел — переключить АМ/ПМ (00–11 / 12–23) в упражнении \"Выставь стрелки\"\n" +
             "  Мышь — перетащите стрелку часов, чтобы выставить время\n\n" +
             CliParser.HelpText,
             "Справка — Тренажёр определения времени",
@@ -353,21 +461,82 @@ public sealed class MainForm : Form
 
     private void ApplyTheme(string theme)
     {
-        var dark = theme.Equals("Dark", StringComparison.OrdinalIgnoreCase);
-        BackColor = dark ? Color.FromArgb(32, 32, 32) : SystemColors.Control;
-        ForeColor = dark ? Color.White : SystemColors.ControlText;
+        var palette = Theme.For(theme);
 
-        foreach (Control control in Controls)
-            ApplyThemeRecursive(control, dark);
+        BackColor = palette.Background;
+        ForeColor = palette.Text;
+
+        _topPanel.BackColor = palette.Surface;
+        StyleLabelTree(_topPanel, palette);
+
+        _modeCombo.BackColor = palette.Surface;
+        _modeCombo.ForeColor = palette.Text;
+        _kindCombo.BackColor = palette.Surface;
+        _kindCombo.ForeColor = palette.Text;
+        _difficultyCombo.BackColor = palette.Surface;
+        _difficultyCombo.ForeColor = palette.Text;
+
+        _newExerciseButton.BackColor = palette.Secondary;
+        _newExerciseButton.ForeColor = Color.White;
+        _checkButton.BackColor = palette.Primary;
+        _checkButton.ForeColor = Color.White;
+        _settingsButton.BackColor = palette.Surface;
+        _settingsButton.ForeColor = palette.Primary;
+        _helpButton.BackColor = palette.Surface;
+        _helpButton.ForeColor = palette.Primary;
+
+        _promptLabel.ForeColor = palette.Primary;
+        _statsLabel.ForeColor = palette.Muted;
+        _exercisePanel.BackColor = palette.Background;
+
+        ApplyExercisePalette();
     }
 
-    private static void ApplyThemeRecursive(Control control, bool dark)
+    private static void StyleLabelTree(Control root, Palette palette)
     {
-        control.BackColor = dark ? Color.FromArgb(45, 45, 45) : SystemColors.Control;
-        control.ForeColor = dark ? Color.White : SystemColors.ControlText;
+        foreach (Control child in root.Controls)
+        {
+            if (child is Label label)
+                label.ForeColor = palette.Text;
 
-        foreach (Control child in control.Controls)
-            ApplyThemeRecursive(child, dark);
+            if (child.Controls.Count > 0)
+                StyleLabelTree(child, palette);
+        }
+    }
+
+    private void ApplyExercisePalette()
+    {
+        var palette = Theme.For(_settings.Theme);
+        ApplyExercisePaletteRecursive(_exercisePanel, palette);
+        UpdatePeriodButtons();
+    }
+
+    private void ApplyExercisePaletteRecursive(Control root, Palette palette)
+    {
+        foreach (Control child in root.Controls)
+        {
+            switch (child)
+            {
+                case AnalogClockControl clock:
+                    clock.ApplyPalette(palette);
+                    break;
+                case RoundedButton button when button != _amButton && button != _pmButton:
+                    break;
+                case Label label:
+                    label.ForeColor = palette.Muted;
+                    break;
+                case NumericUpDown numeric:
+                    numeric.BackColor = palette.Surface;
+                    numeric.ForeColor = palette.Text;
+                    break;
+                case Panel or FlowLayoutPanel or TableLayoutPanel:
+                    child.BackColor = palette.Background;
+                    break;
+            }
+
+            if (child.Controls.Count > 0)
+                ApplyExercisePaletteRecursive(child, palette);
+        }
     }
 
     private readonly record struct ComboItem<T>(string Text, T Value)

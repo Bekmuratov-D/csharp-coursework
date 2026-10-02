@@ -1,0 +1,178 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Duration x:Key="FastDuration">0:0:0.12</Duration>
+    <Duration x:Key="NormalDuration">0:0:0.28</Duration>
+
+    <!-- Filled, rounded, bouncy button used for primary / secondary actions -->
+    <Style x:Key="PillButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="Segoe UI Semibold"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="26,14"/>
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Shell" Background="{TemplateBinding Background}" CornerRadius="18"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#7C4DFF" Opacity="0.25" BlurRadius="14" ShadowDepth="3"/>
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="1.05" Duration="{StaticResource FastDuration}"/>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="1.05" Duration="{StaticResource FastDuration}"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="{StaticResource FastDuration}"/>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="{StaticResource FastDuration}"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="0.95" Duration="0:0:0.06"/>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="0.95" Duration="0:0:0.06"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SecondaryPillButton" TargetType="Button" BasedOn="{StaticResource PillButton}">
+        <Setter Property="Background" Value="{DynamicResource SecondaryBrush}"/>
+    </Style>
+
+    <!-- Outline-style button for low-emphasis actions (settings / help) -->
+    <Style x:Key="GhostButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="Segoe UI Semibold"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="18,10"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Shell" Background="{TemplateBinding Background}" CornerRadius="16"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Pill-shaped selectable "chip", used for mode / exercise / difficulty pickers -->
+    <Style x:Key="ChipToggleButton" TargetType="ToggleButton">
+        <Setter Property="FontFamily" Value="Segoe UI Semibold"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="28,16"/>
+        <Setter Property="Margin" Value="6"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Shell" Background="{TemplateBinding Background}" CornerRadius="20"
+                            Padding="{TemplateBinding Padding}"
+                            BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="Shell" Property="BorderThickness" Value="1.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="1.04" Duration="{StaticResource FastDuration}"/>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="1.04" Duration="{StaticResource FastDuration}"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="{StaticResource FastDuration}"/>
+                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="{StaticResource FastDuration}"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CardBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="CornerRadius" Value="22"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#281E3C" Opacity="0.12" BlurRadius="24" ShadowDepth="6"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PageTitleText" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Semibold"/>
+        <Setter Property="FontSize" Value="26"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style x:Key="SectionLabelText" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+        <Setter Property="Margin" Value="4,0,0,6"/>
+    </Style>
+
+</ResourceDictionary>

@@ -14,10 +14,12 @@ var settings = settingsStore.Load();
 var mode = options.Mode ?? settings.LastMode;
 var kind = options.Kind ?? settings.LastKind;
 var difficulty = options.Difficulty ?? settings.LastDifficulty;
+var format = options.Format ?? settings.LastPromptFormat;
 
 settings.LastMode = mode;
 settings.LastKind = kind;
 settings.LastDifficulty = difficulty;
+settings.LastPromptFormat = format;
 settingsStore.Save(settings);
 
 Console.WriteLine("Тренажёр определения времени — консоль");
@@ -25,7 +27,7 @@ Console.WriteLine($"Режим: {DescribeMode(mode)}   Упражнение: {De
 Console.WriteLine("Подсказка: -h или --help покажет список параметров запуска.");
 Console.WriteLine();
 
-var session = new TrainerSession(new RandomExerciseGenerator(), mode, kind, difficulty);
+var session = new TrainerSession(new RandomExerciseGenerator(), mode, kind, difficulty, format);
 
 session.ExerciseGenerated += (_, exercise) => Console.WriteLine(exercise.Prompt);
 session.AnswerEvaluated += (_, correct) =>

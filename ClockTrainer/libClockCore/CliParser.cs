@@ -10,6 +10,7 @@ public static class CliParser
           --mode=learn|test               режим: обучение (показывает ответ) или проверка знаний
           --exercise=set|elapsed          тип упражнения: выставить стрелки / посчитать разницу времени
           --difficulty=easy|medium|hard   уровень сложности (шаг 30 / 5 / 1 минута)
+          --format=digits|words|mixed     как показывать время в упражнении "выставь стрелки"
           --rounds=N                      количество раундов (по умолчанию 5)
           -h, --help                      показать эту справку
 
@@ -61,6 +62,15 @@ public static class CliParser
                         "medium" => Difficulty.Medium,
                         "hard" => Difficulty.Hard,
                         _ => options.Difficulty
+                    };
+                    break;
+                case "format":
+                    options.Format = value switch
+                    {
+                        "digits" => PromptFormat.Digits,
+                        "words" => PromptFormat.Words,
+                        "mixed" => PromptFormat.Mixed,
+                        _ => options.Format
                     };
                     break;
                 case "rounds":

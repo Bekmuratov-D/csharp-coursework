@@ -6,4 +6,5 @@ public sealed class AppSettings
     public Difficulty LastDifficulty { get; set; } = Difficulty.Medium;
     public ExerciseKind LastKind { get; set; } = ExerciseKind.SetTime;
     public TrainerMode LastMode { get; set; } = TrainerMode.Learn;
+    public PromptFormat LastPromptFormat { get; set; } = PromptFormat.Digits;
 }

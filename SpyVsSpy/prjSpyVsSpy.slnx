@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="libSpyCore/libSpyCore.csproj" />
+  <Project Path="cnsSpyVsSpy/cnsSpyVsSpy.csproj" />
+  <Project Path="wpfSpyVsSpy/wpfSpyVsSpy.csproj" />
+</Solution>

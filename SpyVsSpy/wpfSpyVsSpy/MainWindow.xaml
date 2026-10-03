@@ -1,0 +1,123 @@
+<Window x:Class="SpyVsSpy.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🕵️ Шпион против шпиона" Width="1100" Height="840" MinWidth="920" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource PanelBrush}" Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🕵️ ШПИОН ПРОТИВ ШПИОНА" FontFamily="Georgia" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ScoreText" Text="Вы: 0 🏆   Бот: 0 🏆" FontFamily="Segoe UI Semibold" FontSize="14"
+                               Foreground="{StaticResource GoldBrush}" VerticalAlignment="Center" Margin="28,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="🔄 Новая игра (N)" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="NewGameButton_Click"/>
+                    <Button Content="❓ Правила (F1)" Style="{StaticResource GhostButton}" Click="HelpButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Grid x:Name="BoardHost"/>
+                </Border>
+
+                <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="Ваши трофеи:" FontFamily="Segoe UI Semibold" FontSize="12"
+                                   Foreground="{StaticResource TextBrush}" Width="110"/>
+                        <ItemsControl x:Name="HumanTrophyPanel">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Трофеи бота:" FontFamily="Segoe UI Semibold" FontSize="12"
+                                   Foreground="{StaticResource TextBrush}" Width="110"/>
+                        <ItemsControl x:Name="BotTrophyPanel">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1" Margin="20,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{StaticResource PanelBrush}" CornerRadius="10" Padding="12" Margin="0,0,0,16">
+                    <StackPanel Orientation="Horizontal">
+                        <ContentControl x:Name="SelfCardHost" Margin="0,0,12,0"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="ВАША ЛИЧНОСТЬ" FontFamily="Segoe UI" FontSize="10"
+                                       Foreground="{StaticResource MutedTextBrush}"/>
+                            <TextBlock x:Name="IdentityText" FontFamily="Segoe UI Semibold" FontSize="15"
+                                       Foreground="{StaticResource TextBrush}" Margin="0,2,0,0"/>
+                            <TextBlock x:Name="TurnText" FontFamily="Segoe UI" FontSize="12"
+                                       Foreground="{StaticResource GoldBrush}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="ДЕЙСТВИЕ С ВЫБРАННЫМ" FontFamily="Segoe UI" FontSize="11"
+                               Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,8"/>
+                    <Button x:Name="CatchButton" Content="🔍 Поймать" Style="{StaticResource PillButton}"
+                            HorizontalAlignment="Stretch" Margin="0,0,0,8" IsEnabled="False" Click="CatchButton_Click"/>
+                    <Button x:Name="ScanButton" Content="📡 Сканировать зону" Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Stretch" IsEnabled="False" Click="ScanButton_Click"/>
+                </StackPanel>
+
+                <Border Grid.Row="2" Background="{StaticResource PanelBrush}" CornerRadius="10" Margin="0,20,0,0" Padding="12">
+                    <ScrollViewer x:Name="LogScroll" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="LogPanel"/>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border x:Name="GameOverOverlay" Grid.Row="0" Grid.RowSpan="2" Background="#CC000000" Visibility="Collapsed">
+            <Border Background="{StaticResource PanelBrush}" CornerRadius="16" Padding="40" MaxWidth="420"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock x:Name="GameOverText" FontFamily="Georgia" FontSize="26" FontWeight="Bold"
+                               TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource GoldBrush}"
+                               Margin="0,0,0,24"/>
+                    <Button Content="🔄 Играть снова" Style="{StaticResource PillButton}" Click="NewGameButton_Click"/>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
